@@ -33,7 +33,7 @@ class BooksApiApplicationTests {
 	private String baseUrl;
 	@BeforeEach
 	void setUp() {
-		bookRepository.deleteAll();
+//		bookRepository.deleteAll();
 		baseUrl = "http://localhost:" + port + "/books";
 	}
 
@@ -249,4 +249,34 @@ class BooksApiApplicationTests {
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		assertThat(response.getBody()).contains("Published year must be valid");
 	}
+
+	@Test
+	void shouldGetBooksByAuthor() {
+		Book book = new Book();
+		book.setTitle("Sample Get Book");
+		book.setAuthor("Tester");
+		book.setPublishedDate(LocalDate.of(2024, 1, 1));
+		bookRepository.save(book);
+
+		String url = baseUrl + "?author=Tester";
+
+		ResponseEntity<Book[]> response = restTemplate.getForEntity(url, Book[].class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().length).isGreaterThan(0);
+		assertThat(response.getBody()[0].getAuthor()).isEqualTo("Tester");
+	}
+
+	@Test
+	void shouldReturnEmptyWhenAuthorNotFound() {
+		String url = baseUrl + "?author=Unknown";
+
+		ResponseEntity<Book[]> response = restTemplate.getForEntity(url, Book[].class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().length).isEqualTo(0);
+	}
+
 }
