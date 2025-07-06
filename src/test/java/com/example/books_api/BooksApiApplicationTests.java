@@ -255,7 +255,7 @@ class BooksApiApplicationTests {
 		Book book = new Book();
 		book.setTitle("Sample Get Book");
 		book.setAuthor("Tester");
-		book.setPublishedDate(LocalDate.of(2024, 1, 1));
+		book.setPublishedDate(LocalDate.of(2568, 1, 1));
 		bookRepository.save(book);
 
 		String url = baseUrl + "?author=Tester";
@@ -278,5 +278,15 @@ class BooksApiApplicationTests {
 		assertThat(response.getBody()).isNotNull();
 		assertThat(response.getBody().length).isEqualTo(0);
 	}
+
+	@Test
+	void shouldFailWhenAuthorParamIsMissing() {
+		String url = baseUrl;
+
+		ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+	}
+
 
 }
